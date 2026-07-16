@@ -86,6 +86,64 @@ function inferMcuId(uploadedJson, packageData, selectedMcuId, manifest) {
   return selectedMcuId;
 }
 
+function inferMcuName(uploadedJson, packageData, mcuId) {
+  const explicit = getString(uploadedJson.mcuName, uploadedJson.mcuDisplayName);
+  if (explicit) {
+    return explicit;
+  }
+
+  const partNumber = getString(
+    packageData.partInfo?.partNumber,
+    packageData.partInfo?.series,
+  );
+  const baseName = partNumber.replace(/-[A-Za-z0-9]{2,8}$/, "");
+  if (baseName) {
+    return baseName;
+  }
+
+  return mcuId.toUpperCase();
+}
+
+function createNewMcuManifestEntry(uploadedJson, packageData, mcuId) {
+  const entry = {
+    id: mcuId,
+    name: inferMcuName(uploadedJson, packageData, mcuId),
+    packages: [],
+    devicetreeExportUnsupportedReason: getString(
+      uploadedJson.devicetreeExportUnsupportedReason,
+      "DeviceTree export not supported for locally uploaded parts.",
+    ),
+  };
+
+  if (typeof uploadedJson.supportsNonSecure === "boolean") {
+    entry.supportsNonSecure = uploadedJson.supportsNonSecure;
+  }
+  if (typeof uploadedJson.supportsFLPR === "boolean") {
+    entry.supportsFLPR = uploadedJson.supportsFLPR;
+  }
+
+  return entry;
+}
+
+// Looks up the MCU manifest entry for a local-part upload, creating a new
+// (in-memory only) entry when the part describes an MCU that isn't in the
+// public manifest yet. This lets pre-release parts be loaded entirely from
+// an uploaded JSON file without ever being registered in manifest.json.
+function ensureMcuManifestEntry(manifest, mcuId, uploadedJson, packageData) {
+  const existingEntry = getMcuManifestEntry(manifest, mcuId);
+  if (existingEntry) {
+    return existingEntry;
+  }
+
+  if (!isObject(manifest) || !Array.isArray(manifest.mcus)) {
+    throw new Error("MCU manifest is not loaded.");
+  }
+
+  const newEntry = createNewMcuManifestEntry(uploadedJson, packageData, mcuId);
+  manifest.mcus.push(newEntry);
+  return newEntry;
+}
+
 function inferPackageName(uploadedJson, packageData, fileName) {
   const packageMeta = isObject(uploadedJson.package)
     ? uploadedJson.package
@@ -204,13 +262,19 @@ export function createLocalPartRegistration(
   validatePackageData(packageData);
 
   const mcuId = inferMcuId(uploadedJson, packageData, selectedMcuId, manifest);
-  const mcuEntry = getMcuManifestEntry(manifest, mcuId);
 
-  if (!mcuEntry) {
+  if (!mcuId) {
     throw new Error(
-      `MCU "${mcuId || "(unknown)"}" is not available in the public manifest.`,
+      'Could not determine which MCU this part belongs to. Include an "mcuId" field in the part description, or select an MCU first.',
     );
   }
+
+  const mcuEntry = ensureMcuManifestEntry(
+    manifest,
+    mcuId,
+    uploadedJson,
+    packageData,
+  );
 
   const rawPackageId = inferPackageId(uploadedJson, packageData, fileName);
   const packageId = makeLocalPackageId(rawPackageId, mcuEntry);
@@ -274,12 +338,22 @@ export async function handlePartDescriptionUpload(event) {
     registerLocalPart(registration);
 
     const mcuSelector = document.getElementById("mcuSelector");
+    const mcuEntry = getMcuManifestEntry(state.mcuManifest, registration.mcuId);
     if (
+      !mcuEntry ||
       !Array.from(mcuSelector.options).some(
         (option) => option.value === registration.mcuId,
       )
     ) {
-      throw new Error(`MCU "${registration.mcuId}" is not available.`);
+      if (!mcuEntry) {
+        throw new Error(`MCU "${registration.mcuId}" is not available.`);
+      }
+      const option = document.createElement("option");
+      option.value = mcuEntry.id;
+      option.textContent = mcuEntry.name;
+      option.dataset.packages = JSON.stringify(mcuEntry.packages);
+      option.dataset.localPart = "true";
+      mcuSelector.appendChild(option);
     }
 
     mcuSelector.value = registration.mcuId;
