@@ -1844,76 +1844,120 @@
     {
       "id": "PDM20",
       "type": "PDM",
-      "description": "PDM interface for GPIO port 1",
+      "description": "PDM interface for GPIO port 1 or 3",
       "baseAddress": "0x400D0000",
       "signals": [
         {
           "name": "CLK",
           "direction": "output",
-          "allowedGpio": ["P1*"],
+          "allowedGpio": ["P1*", "P3*"],
           "requiresClockCapablePin": true
         },
-        { "name": "DIN", "direction": "input", "allowedGpio": ["P1*"] }
+        {
+          "name": "DIN",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        }
       ]
     },
     {
       "id": "PDM21",
       "type": "PDM",
-      "description": "PDM interface for GPIO port 1",
+      "description": "PDM interface for GPIO port 1 or 3",
       "baseAddress": "0x400D1000",
       "signals": [
         {
           "name": "CLK",
           "direction": "output",
-          "allowedGpio": ["P1*"],
+          "allowedGpio": ["P1*", "P3*"],
           "requiresClockCapablePin": true
         },
-        { "name": "DIN", "direction": "input", "allowedGpio": ["P1*"] }
+        {
+          "name": "DIN",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        }
       ]
     },
     {
       "id": "TDM",
       "type": "TDM",
-      "description": "TDM interface for GPIO port 1",
+      "description": "TDM interface for GPIO port 1 or 3",
       "baseAddress": "0x400E8000",
       "signals": [
         {
           "name": "MCK",
           "direction": "output",
-          "allowedGpio": ["P1*"],
+          "allowedGpio": ["P1*", "P3*"],
           "requiresClockCapablePin": true
         },
         {
           "name": "SCK",
           "direction": "output",
-          "allowedGpio": ["P1*"],
+          "allowedGpio": ["P1*", "P3*"],
           "requiresClockCapablePin": true
         },
-        { "name": "FSYNC", "direction": "output", "allowedGpio": ["P1*"] },
-        { "name": "SDIN", "direction": "input", "allowedGpio": ["P1*"] },
-        { "name": "SDOUT", "direction": "output", "allowedGpio": ["P1*"] }
+        {
+          "name": "FSYNC",
+          "direction": "output",
+          "allowedGpio": ["P1*", "P3*"]
+        },
+        {
+          "name": "SDIN",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        },
+        {
+          "name": "SDOUT",
+          "direction": "output",
+          "allowedGpio": ["P1*", "P3*"]
+        }
       ]
     },
     {
       "id": "QDEC20",
       "type": "QDEC",
-      "description": "Quadrature Decoder for GPIO port 1",
+      "description": "Quadrature Decoder for GPIO port 1 or 3",
       "baseAddress": "0x400E0000",
       "signals": [
-        { "name": "A", "direction": "input", "allowedGpio": ["P1*"] },
-        { "name": "B", "direction": "input", "allowedGpio": ["P1*"] },
-        { "name": "LED", "direction": "output", "allowedGpio": ["P1*"] }
+        {
+          "name": "A",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        },
+        {
+          "name": "B",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        },
+        {
+          "name": "LED",
+          "direction": "output",
+          "allowedGpio": ["P1*", "P3*"]
+        }
       ]
     },
     {
       "id": "QDEC21",
       "type": "QDEC",
-      "description": "Quadrature Decoder for GPIO port 1",
+      "description": "Quadrature Decoder for GPIO port 1 or 3",
       "baseAddress": "0x400E1000",
       "signals": [
-        { "name": "A", "direction": "input", "allowedGpio": ["P1*"] },
-        { "name": "B", "direction": "input", "allowedGpio": ["P1*"] },
-        { "name": "LED", "direction": "output", "allowedGpio": ["P1*"] }
+        {
+          "name": "A",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        },
+        {
+          "name": "B",
+          "direction": "input",
+          "allowedGpio": ["P1*", "P3*"]
+        },
+        {
+          "name": "LED",
+          "direction": "output",
+          "allowedGpio": ["P1*", "P3*"]
+        }
       ]
     }
   ]
