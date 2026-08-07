@@ -413,6 +413,7 @@ export function editPeripheral(id) {
   openPinSelectionModal(
     selected.peripheral,
     selected.pinFunctions,
+    selected.label,
     selected.config || {},
   );
 }

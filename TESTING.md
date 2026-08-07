@@ -44,8 +44,11 @@ Using Playwright, navigate to 0.0.0.0:8000 and perform the following tests on th
 - Verify SPIM/SPIS20 is disabled (address conflict with UARTE20)
 - Click on SPIM/SPIS21
 - Select P1.03 for SCK (should only show clock-capable pins)
+- Add label spi_sck_sensor
 - Select P1.04 for SDO
+- Add label spi_sdo_sensor
 - Select P1.05 for CS
+- Add label spi_cs_sensor
 - Verify P1.00, P1.01 are disabled (used by UART)
 - Confirm selection
 - Verify SPIM/SPIS21 appears in Selected list
@@ -125,6 +128,7 @@ Using Playwright, navigate to 0.0.0.0:8000 and perform the following tests on th
 - [ ] Pin dropdowns show only compatible pins
 - [ ] Clock-capable pins marked with "(Clock)" suffix
 - [ ] Used pins disabled with "(in use)" suffix
+- [ ] Pin modal validates label format
 
 ### Conflict Detection
 

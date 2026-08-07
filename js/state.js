@@ -8,6 +8,7 @@ const state = {
   usedAddresses: {},
   currentPeripheral: null,
   tempSelectedPins: {},
+  labels: {},
   deviceTreeTemplates: null,
   boardInfo: null,
   consoleUart: null, // Peripheral ID (e.g., "UARTE20") of selected console UART, or null for RTT
@@ -65,19 +66,41 @@ export function getPersistenceKey() {
 }
 
 export function serializePeripheral(peripheral) {
+  const pinNumbers = {};
+  let pinNum = "";
+
   if (peripheral.type === "GPIO") {
+    state.mcuData.pins.forEach((row) => {
+      if (row.name === peripheral.pin) {
+        pinNum = row.packagePinId;
+      }
+    });
     return {
       id: peripheral.id,
       type: peripheral.type,
       label: peripheral.label,
       pin: peripheral.pin,
+      pinNumbers: pinNum,
       activeState: peripheral.activeState,
     };
+  }
+
+  if (peripheral.id !== "HFXO" && peripheral.id !== "LFXO") {
+    const key = Object.keys(peripheral.pinFunctions);
+    key.forEach((pinName) => {
+      state.mcuData.pins.forEach((row) => {
+        if (row.name === pinName) {
+          pinNumbers[pinName] = row.packagePinId;
+        }
+      });
+    });
   }
 
   return {
     id: peripheral.id,
     pinFunctions: peripheral.pinFunctions,
+    pinNumbers: pinNumbers,
+    label: peripheral.label,
     config: peripheral.config,
   };
 }
@@ -190,12 +213,14 @@ export function applyConfig(config) {
           id: p_data.id,
           peripheral: p_data,
           pinFunctions,
+          label: p_config.label,
         });
       } else {
         state.selectedPeripherals.push({
           id: p_data.id,
           peripheral: p_data,
           pinFunctions: p_config.pinFunctions,
+          label: p_config.label,
           config: p_config.config || {},
         });
         for (const pinName in p_config.pinFunctions) {
