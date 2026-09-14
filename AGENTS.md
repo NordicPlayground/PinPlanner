@@ -211,9 +211,11 @@ State is saved to `localStorage` per MCU/package combination:
 - Pin conflicts are checked before assignment
 - **GPIO port constraint**: a peripheral cannot mix pins from different GPIO
   ports. `getPeripheralPortLock()` in `js/ui/modals.js` intersects the ports
-  reachable by each mandatory signal; two or more candidates means the user has
-  a port choice, and the first pin selected locks the remaining signals to that
-  port (clearing every pin unlocks it). Peripherals whose signals are each
+  reachable by each mandatory signal. Any candidate constrains the peripheral:
+  several candidates means the user picks one and the first pin selected locks
+  the remaining signals to it (clearing every pin unlocks it), a single
+  candidate means every signal must go to that port. Peripherals whose signals
+  are each
   hard-wired to a different port (GRTC drives its 32 kHz output from P0 and its
   fast clock output from P1) have no common port and are left unconstrained, as
   are signals whose pins have no port at all (high-speed USB D+/D-).

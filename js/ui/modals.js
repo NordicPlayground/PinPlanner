@@ -350,7 +350,10 @@ function getPortForPin(pinName) {
 
 // Ports that could host the whole peripheral: every mandatory signal has to be
 // reachable from the port, so the candidates are the intersection of their
-// allowed ports. Two or more candidates means the user has a choice to lock.
+// allowed ports. Any candidate at all constrains the peripheral - two or more
+// means the user picks one, exactly one means every signal has to go there
+// even if some of them could individually reach further. No candidates means
+// the signals are hard-wired to different ports and nothing can be enforced.
 function getPeripheralPortLock(peripheral) {
   const signalPorts = (peripheral?.signals || [])
     .map((signal) => ({ signal, ports: getPortsForSignal(signal) }))
@@ -366,7 +369,7 @@ function getPeripheralPortLock(peripheral) {
     new Set(pool[0].ports),
   );
 
-  return { locked: candidates.size > 1, ports: candidates };
+  return { locked: candidates.size > 0, ports: candidates };
 }
 
 // The port the user has already committed to, if any.
