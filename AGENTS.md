@@ -209,6 +209,15 @@ State is saved to `localStorage` per MCU/package combination:
 - Each pin can have multiple functions (GPIO, peripheral signals)
 - `availableFor` array in pin definitions lists compatible peripherals
 - Pin conflicts are checked before assignment
+- **GPIO port constraint**: a peripheral cannot mix pins from different GPIO
+  ports. `getPeripheralPortLock()` in `js/ui/modals.js` intersects the ports
+  reachable by each mandatory signal; two or more candidates means the user has
+  a port choice, and the first pin selected locks the remaining signals to that
+  port (clearing every pin unlocks it). Peripherals whose signals are each
+  hard-wired to a different port (GRTC drives its 32 kHz output from P0 and its
+  fast clock output from P1) have no common port and are left unconstrained, as
+  are signals whose pins have no port at all (high-speed USB D+/D-).
+  `confirmPinSelection()` re-checks the rule
 - Address space conflicts checked for memory-mapped peripherals (SPI, I2C, UART, etc.)
 
 ### Oscillator Handling

@@ -194,7 +194,8 @@ function populatePinSelectionTable(peripheral) {
       let optionsHtml = '<option value="">-- Select Pin --</option>';
       allPossiblePins.forEach((pin) => {
         const isSelected = state.tempSelectedPins[pin.name] === signal.name;
-        optionsHtml += `<option value="${pin.name}" ${isSelected ? "selected" : ""}>${pin.name}${pin.isClockCapable ? " (Clock)" : ""}</option>`;
+        const label = `${pin.name}${pin.isClockCapable ? " (Clock)" : ""}`;
+        optionsHtml += `<option value="${pin.name}" data-label="${label}" ${isSelected ? "selected" : ""}>${label}</option>`;
       });
       selectionHtml = `<select data-signal="${signal.name}" ${signal.isMandatory ? "required" : ""}>${optionsHtml}</select>`;
     }
@@ -277,6 +278,7 @@ function updateModalPinAvailability() {
   );
 
   const pinsSelectedInModal = Object.keys(state.tempSelectedPins);
+  const portRestriction = getPortRestriction(state.currentPeripheral);
 
   selects.forEach((select) => {
     const signalForThisSelect = select.dataset.signal;
@@ -290,8 +292,13 @@ function updateModalPinAvailability() {
       const isUsedInThisModal =
         pinsSelectedInModal.includes(pinName) &&
         state.tempSelectedPins[pinName] !== signalForThisSelect;
+      const isWrongPort = isPinPortBlocked(pinName, portRestriction);
 
-      option.disabled = isUsedByOtherPeripheral || isUsedInThisModal;
+      option.disabled =
+        isUsedByOtherPeripheral || isUsedInThisModal || isWrongPort;
+      option.textContent = `${option.dataset.label || pinName}${
+        isWrongPort ? portBlockedSuffix(portRestriction) : ""
+      }`;
     }
   });
 
@@ -306,8 +313,95 @@ function updateModalPinAvailability() {
       pinsSelectedInModal.includes(pinName) &&
       state.tempSelectedPins[pinName] !== signalForThisCheckbox;
 
-    checkbox.disabled = isUsedByOtherPeripheral || isUsedInThisModal;
+    checkbox.disabled =
+      isUsedByOtherPeripheral ||
+      isUsedInThisModal ||
+      isPinPortBlocked(pinName, portRestriction);
   });
+}
+
+// --- GPIO PORT CONSTRAINT ---
+//
+// nRF54L GPIO port capabilities: a peripheral instance cannot mix pins from
+// different GPIO ports - every pin it uses must sit on the same port. Several
+// peripherals are reachable from more than one port (UARTE20 on the nRF54LM20A
+// can use Port 1 or Port 3), and that choice is what has to stay consistent.
+//
+// Out-of-port options are disabled and labelled with the port they are locked
+// out by, so the rule explains itself where the user is looking.
+//
+// The constraint only applies where there is a choice to keep. Signals whose
+// pins carry no port at all (high-speed USB D+/D-) are exempt, and peripherals
+// whose signals are each hard-wired to a different port - GRTC drives its
+// 32 kHz output from Port 0 and its fast clock output from Port 1 - have no
+// common port to lock onto and are left alone.
+
+function getPortsForSignal(signal) {
+  return new Set(
+    getPinsForSignal(signal)
+      .map((pin) => pin.port)
+      .filter(Boolean),
+  );
+}
+
+function getPortForPin(pinName) {
+  return state.mcuData.pins?.find((pin) => pin.name === pinName)?.port || null;
+}
+
+// Ports that could host the whole peripheral: every mandatory signal has to be
+// reachable from the port, so the candidates are the intersection of their
+// allowed ports. Two or more candidates means the user has a choice to lock.
+function getPeripheralPortLock(peripheral) {
+  const signalPorts = (peripheral?.signals || [])
+    .map((signal) => ({ signal, ports: getPortsForSignal(signal) }))
+    .filter((entry) => entry.ports.size > 0);
+
+  const mandatory = signalPorts.filter((entry) => entry.signal.isMandatory);
+  const pool = mandatory.length > 0 ? mandatory : signalPorts;
+  if (pool.length === 0) return { locked: false, ports: new Set() };
+
+  const candidates = pool.reduce(
+    (shared, entry) =>
+      new Set([...shared].filter((port) => entry.ports.has(port))),
+    new Set(pool[0].ports),
+  );
+
+  return { locked: candidates.size > 1, ports: candidates };
+}
+
+// The port the user has already committed to, if any.
+function getActivePort() {
+  for (const pinName of Object.keys(state.tempSelectedPins)) {
+    const port = getPortForPin(pinName);
+    if (port) return port;
+  }
+  return null;
+}
+
+function getPortRestriction(peripheral) {
+  const lock = getPeripheralPortLock(peripheral);
+  if (!lock.locked) return null;
+
+  const activePort = getActivePort();
+  return {
+    activePort,
+    allowedPorts: activePort ? new Set([activePort]) : lock.ports,
+  };
+}
+
+function isPinPortBlocked(pinName, restriction) {
+  if (!restriction) return false;
+
+  const port = getPortForPin(pinName);
+  // A pin with no port of its own (USB D+/D-) is never part of the constraint.
+  if (!port) return false;
+  return !restriction.allowedPorts.has(port);
+}
+
+function portBlockedSuffix(restriction) {
+  return restriction?.activePort
+    ? ` (locked to ${restriction.activePort})`
+    : " (port not usable)";
 }
 
 function getPinsForSignal(signal) {
@@ -365,6 +459,27 @@ export function confirmPinSelection() {
     ) {
       alert(
         `Pin ${pinName} is already used by ${state.usedPins[pinName].peripheral}.`,
+      );
+      return;
+    }
+  }
+
+  // Backstop for the option filtering above: editing a peripheral that was
+  // saved before this rule existed opens the modal with mixed pins already in
+  // place, and nothing forces the user to touch them before confirming.
+  const portLock = getPeripheralPortLock(state.currentPeripheral);
+  if (portLock.locked) {
+    const portsInUse = new Set(
+      Object.keys(state.tempSelectedPins)
+        .map((pinName) => getPortForPin(pinName))
+        .filter(Boolean),
+    );
+    if (portsInUse.size > 1) {
+      alert(
+        `${state.currentPeripheral.id} cannot mix GPIO ports. ` +
+          `All of its pins must be on the same port, but ${[...portsInUse]
+            .sort()
+            .join(" and ")} are both selected.`,
       );
       return;
     }
