@@ -287,13 +287,19 @@ export async function loadCurrentMcuData() {
   return false;
 }
 
-export async function loadMCUData(mcu, pkg) {
+// Resolves a package definition (following `extends` chains and preferring an
+// uploaded local part) without touching application state. Used by consumers
+// that need to inspect packages other than the selected one.
+export async function resolvePackageDataFor(mcu, pkg) {
   const localPart = getLocalPartPackage(mcu, pkg);
-  const path = `mcus/${mcu}/${pkg}.json`;
+  return localPart
+    ? await loadResolvedLocalPackageData(mcu, pkg, localPart.packageData)
+    : await loadResolvedPackageData(`mcus/${mcu}/${pkg}.json`);
+}
+
+export async function loadMCUData(mcu, pkg) {
   try {
-    state.mcuData = localPart
-      ? await loadResolvedLocalPackageData(mcu, pkg, localPart.packageData)
-      : await loadResolvedPackageData(path);
+    state.mcuData = await resolvePackageDataFor(mcu, pkg);
 
     state.deviceTreeTemplates = await loadDeviceTreeTemplates(mcu, pkg);
 

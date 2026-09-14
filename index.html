@@ -98,19 +98,6 @@
       </div>
     </header>
 
-    <section class="page-title">
-      <div class="page-title-inner">
-        <h1>nRF Pin Planner</h1>
-        <p class="subtitle">
-          Plan pin assignments and generate Zephyr board definitions for nRF
-          SoCs. Created by
-          <a href="https://www.linkedin.com/in/helmutlord/" target="_blank"
-            >Helmut Lord</a
-          >.
-        </p>
-      </div>
-    </section>
-
     <main class="container">
       <button
         type="button"
@@ -626,6 +613,45 @@
         <div class="modal-footer">
           <button id="cancelOscillatorConfig">Cancel</button>
           <button id="confirmOscillatorConfig">Confirm Configuration</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product comparison launcher: a sheet of paper peeking above the bottom
+         edge of the window, centred. Hover lifts it, click opens it. -->
+    <div id="productComparisonLauncher" class="comparison-launcher">
+      <button
+        type="button"
+        id="productComparisonOpenBtn"
+        class="comparison-paper"
+      >
+        <span class="comparison-tab">
+          <span>Compare nRF54L Parts</span>
+          <span class="comparison-arrow" aria-hidden="true">&uarr;</span>
+        </span>
+        <span class="comparison-sheet">
+          <strong class="comparison-sheet-title">Which nRF54L is which?</strong>
+          <span class="comparison-sheet-text">
+            Memory, I/O, radio and Edge AI for every part and package in the
+            series, side by side.
+          </span>
+          <span class="comparison-sheet-cta">Open the comparison &rarr;</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- nRF54L Product Comparison Modal -->
+    <div id="productComparisonModal" class="modal">
+      <div class="modal-content comparison-modal-content">
+        <div class="modal-header">
+          <h2>nRF54L Series Comparison</h2>
+          <span class="close" id="closeProductComparisonModal">&times;</span>
+        </div>
+        <div id="productComparisonBody"></div>
+        <div class="modal-footer">
+          <button id="productComparisonDoneBtn" class="secondary-btn">
+            Close
+          </button>
         </div>
       </div>
     </div>
