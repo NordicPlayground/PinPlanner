@@ -19,10 +19,12 @@ let tempSpiCsGpios = [];
 export function openPinSelectionModal(
   peripheral,
   existingPins = {},
+  existingLabels = {},
   existingConfig = {},
 ) {
   state.currentPeripheral = peripheral;
   state.tempSelectedPins = { ...existingPins };
+  state.labels = { ...existingLabels };
 
   document.getElementById("modalTitle").textContent =
     `Select Pins for ${peripheral.id}`;
@@ -51,7 +53,7 @@ export function openPinSelectionModal(
 
   const noteSection = document.getElementById("peripheralNoteSection");
   const noteInput = document.getElementById("peripheralNote");
-  if (["SPI", "I2C", "UART"].includes(peripheral.type)) {
+  if (["SPI", "TWI", "UART"].includes(peripheral.type)) {
     noteSection.style.display = "block";
     noteInput.value = existingConfig.note || "";
   } else {
@@ -66,6 +68,7 @@ export function closePinSelectionModal() {
   document.getElementById("pinSelectionModal").style.display = "none";
   state.currentPeripheral = null;
   state.tempSelectedPins = {};
+  state.labels = {};
 }
 
 function updateRxdRequiredStatus() {
@@ -200,7 +203,14 @@ function populatePinSelectionTable(peripheral) {
             <td>${signal.name}</td>
             <td>${signal.isMandatory ? "Yes" : "No"}</td>
             <td>${selectionHtml}</td>
-            <td>${signal.description || ""}</td>
+            <td>
+              <input type="text"
+              value="${state.labels[signal.name] ? state.labels[signal.name] : ""}"
+              placeholder="e.g., spi0, i2c0"
+              pattern="[a-z0-9_]+"
+              data-field="${signal.name}"
+              maxlength="20">
+            </td>
         `;
     tableBody.appendChild(row);
   });
@@ -211,11 +221,30 @@ function populatePinSelectionTable(peripheral) {
       input.addEventListener("change", handlePinSelectionChange);
     });
 
+  tableBody.querySelectorAll('input[type="text"]').forEach((input) => {
+    input.addEventListener("change", handleLabelModificationChange);
+  });
+
   tableBody.querySelectorAll("select").forEach((select) => {
     enableScrollWheelSelectionForElement(select);
   });
 
   updateModalPinAvailability();
+}
+
+function handleLabelModificationChange(event) {
+  const input = event.target;
+  const signalName = input.dataset.field;
+
+  Object.keys(state.labels).forEach((pin) => {
+    if (state.labels[pin] === signalName) {
+      delete state.labels[pin];
+    }
+  });
+
+  if (input.value) {
+    state.labels[signalName] = input.value;
+  }
 }
 
 function handlePinSelectionChange(event) {
@@ -356,6 +385,7 @@ export function confirmPinSelection() {
     id: state.currentPeripheral.id,
     peripheral: state.currentPeripheral,
     pinFunctions: { ...state.tempSelectedPins },
+    label: { ...state.labels },
   };
 
   if (state.currentPeripheral.type === "UART") {
