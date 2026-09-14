@@ -171,31 +171,6 @@ a:hover {
   z-index: 2;
 }
 
-/* 3. PAGE TITLE STRIP (flat white, replaces hero) */
-.page-title {
-  background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.3s;
-}
-.page-title-inner {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 0.9rem 2rem 0.8rem;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
-}
-.page-title h1 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-.page-title .subtitle {
-  color: var(--light-text);
-  font-size: 0.9rem;
-}
-
 /* 4. LAYOUT */
 .container {
   max-width: 1800px;
@@ -1454,6 +1429,199 @@ button.secondary-btn:hover,
   font-size: 0.8rem;
 }
 
+/* 17b. nRF54L PRODUCT COMPARISON */
+
+/* Launcher: a sheet of paper slipped under the bottom edge of the window with
+   only its tab showing. Hover or keyboard focus lifts the sheet into view; a
+   click anywhere on it opens the comparison. */
+.comparison-launcher {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  width: min(23rem, calc(100vw - 1.5rem));
+}
+
+.comparison-paper {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: var(--text-color);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--dz-lime);
+  border-bottom: none;
+  box-shadow: 0 -4px 18px var(--shadow-color);
+  cursor: pointer;
+}
+.comparison-paper:hover,
+.comparison-paper:focus-visible {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+.comparison-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--light-text);
+  transition: color 0.2s;
+}
+.comparison-paper:hover .comparison-tab,
+.comparison-paper:focus-visible .comparison-tab {
+  color: var(--link-color);
+}
+
+.comparison-arrow {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.comparison-sheet {
+  display: grid;
+  gap: 0.3rem;
+  max-height: 0;
+  padding: 0 1rem;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.25s ease,
+    padding-bottom 0.25s ease,
+    opacity 0.2s ease;
+}
+.comparison-paper:hover .comparison-sheet,
+.comparison-paper:focus-visible .comparison-sheet {
+  max-height: 12rem;
+  padding-bottom: 0.9rem;
+  opacity: 1;
+}
+
+.comparison-sheet-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--link-color);
+}
+.comparison-sheet-text {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--light-text);
+}
+.comparison-sheet-cta {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--link-color);
+}
+
+/* Comparison modal */
+.comparison-modal-content {
+  max-width: 1280px;
+  width: 96%;
+  max-height: 88vh;
+}
+
+#productComparisonBody {
+  padding: 1.25rem 1.5rem 1.5rem;
+  overflow-y: auto;
+}
+
+.comparison-loading {
+  font-size: 0.86rem;
+  color: var(--light-text);
+}
+
+/* The table is deliberately wide; let it scroll rather than wrap into mush. */
+.comparison-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.comparison-table th,
+.comparison-table td {
+  padding: 0.35rem 0.5rem;
+  border-right: 1px solid var(--border-color);
+  text-align: center;
+  vertical-align: middle;
+}
+.comparison-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--light-text);
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+}
+.comparison-table th[title],
+.comparison-table td[title] {
+  cursor: help;
+}
+
+.comparison-group-start > * {
+  border-top: 2px solid var(--border-color);
+}
+.comparison-table tbody tr.is-loaded {
+  background-color: rgba(0, 169, 206, 0.08);
+}
+
+.comparison-part {
+  text-align: left;
+  font-size: 0.88rem;
+  font-weight: 900;
+  background-color: var(--card-bg);
+}
+.comparison-package {
+  text-align: left;
+}
+.comparison-package-size {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--light-text);
+}
+
+.comparison-yes {
+  font-weight: 900;
+  color: var(--primary-color);
+}
+.comparison-no {
+  color: var(--light-text);
+}
+
+.comparison-load-btn {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* 18. ACCESSIBILITY */
 button:focus-visible,
 select:focus-visible,
@@ -1504,7 +1672,6 @@ a:focus-visible {
     padding: 1rem 0.75rem 1.5rem;
   }
   .site-header-inner,
-  .page-title-inner,
   .footer-inner {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
@@ -1521,5 +1688,8 @@ a:focus-visible {
   .pmic-feature-callout {
     align-items: flex-start;
     flex-direction: column;
+  }
+  #productComparisonBody {
+    padding: 1rem;
   }
 }

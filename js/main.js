@@ -46,6 +46,7 @@ import {
   openPmicModal,
   renderPmicPanel,
 } from "./pmic.js";
+import { initProductComparison } from "./product-comparison.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Set up event listeners
@@ -209,6 +210,9 @@ document.addEventListener("DOMContentLoaded", function () {
         setTheme(e.matches);
       }
     });
+
+  // nRF54L product comparison launcher and table
+  initProductComparison();
 
   // Scroll-wheel selection on dropdowns
   enableScrollWheelSelection("mcuSelector");

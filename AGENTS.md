@@ -53,22 +53,24 @@ npx http-server
 
 The application uses native ES modules (`<script type="module">`). No bundler required.
 
-| Module                   | Purpose                                                       |
-| ------------------------ | ------------------------------------------------------------- |
-| `js/main.js`             | Entry point: event wiring, theme setup, initialization        |
-| `js/state.js`            | Centralized state object, persistence (save/load/reset)       |
-| `js/mcu-loader.js`       | MCU/package loading, `initializeApp`, `reinitializeView`      |
-| `js/peripherals.js`      | Peripheral organization, toggle, oscillator config, filtering |
-| `js/pin-layout.js`       | Responsive pin diagram rendering, pin display updates         |
-| `js/devicetree.js`       | All DeviceTree generation functions (30+)                     |
-| `js/export.js`           | Board info modal, ZIP assembly, overlay export                |
-| `js/console-config.js`   | Serial console UART selection and warnings                    |
-| `js/devkit-loader.js`    | Load devkit configs, overlay generation mode                  |
-| `js/utils.js`            | Shared utilities (scroll wheel, `parsePinName`)               |
-| `js/ui/modals.js`        | Pin selection modal, GPIO modal                               |
-| `js/ui/selected-list.js` | Selected peripherals list rendering                           |
-| `js/ui/import-export.js` | JSON config import/export modals                              |
-| `js/ui/notifications.js` | Toast notification system                                     |
+| Module                          | Purpose                                                            |
+| ------------------------------- | ------------------------------------------------------------------ |
+| `js/main.js`                    | Entry point: event wiring, theme setup, initialization             |
+| `js/state.js`                   | Centralized state object, persistence (save/load/reset)            |
+| `js/mcu-loader.js`              | MCU/package loading, `initializeApp`, `reinitializeView`           |
+| `js/peripherals.js`             | Peripheral organization, toggle, oscillator config, filtering      |
+| `js/pin-layout.js`              | Responsive pin diagram rendering, pin display updates              |
+| `js/devicetree.js`              | All DeviceTree generation functions (30+)                          |
+| `js/export.js`                  | Board info modal, ZIP assembly, overlay export                     |
+| `js/console-config.js`          | Serial console UART selection and warnings                         |
+| `js/devkit-loader.js`           | Load devkit configs, overlay generation mode                       |
+| `js/utils.js`                   | Shared utilities (scroll wheel, `parsePinName`)                    |
+| `js/product-comparison.js`      | nRF54L product comparison: launcher sheet, comparison table        |
+| `js/product-comparison-data.js` | Per-part facts for the comparison (memory, supply, protocols, NPU) |
+| `js/ui/modals.js`               | Pin selection modal, GPIO modal                                    |
+| `js/ui/selected-list.js`        | Selected peripherals list rendering                                |
+| `js/ui/import-export.js`        | JSON config import/export modals                                   |
+| `js/ui/notifications.js`        | Toast notification system                                          |
 
 ### Other Key Files
 
@@ -156,7 +158,23 @@ All state is centralized in `js/state.js` via a single exported `state` object:
 - Color-codes pins by assignment status (available, used, selected, devkit-occupied)
 - Interactive hover shows pin details
 
-#### 7. Board Definition Export (export.js + devicetree.js)
+#### 7. Product Comparison (product-comparison.js)
+
+- Launcher is a sheet fixed to the bottom-centre of the window showing only its
+  tab; hover or keyboard focus lifts the teaser into view, a click opens the table
+- One table row per part and package across the whole nRF54L Series; part-level
+  cells (NVM, RAM, supply, TX, NPU, 802.15.4, Matter) use `rowspan` over the
+  part's packages, package-level cells (GPIO, serial, ADC, NFC, USB, audio,
+  QSPI) are per row
+- Part-level facts live in `product-comparison-data.js`; package-level facts are
+  derived at runtime from the same package JSON the pin diagram uses, via
+  `resolvePackageDataFor()`
+- Features uniform across the series (Cortex-M33, RISC-V coprocessor, TrustZone,
+  Channel Sounding) have no column and are covered in the notes below the table
+- The row for the currently selected MCU/package is highlighted
+- "Load" on a row sets the MCU/package selectors and calls `handleMcuChange()`
+
+#### 8. Board Definition Export (export.js + devicetree.js)
 
 **Custom board mode**: Generates a complete Zephyr board definition as ZIP:
 
