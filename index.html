@@ -19,8 +19,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Lato is fetched up front and declared display=optional: Lato and the
+         fallback stack wrap text differently, so swapping the face in after
+         first paint reflows the peripheral list and console banner. Preloading
+         the Latin subsets means Lato is normally ready before first paint; if
+         it is not, the page keeps the fallback for that view rather than
+         shifting. Update these URLs if the Lato version in the stylesheet
+         below changes. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHjx4wXg.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/lato/v25/S6u9w4BMUTPHh6UVSwiPGQ.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/lato/v25/S6u9w4BMUTPHh50XSwiPGQ.woff2"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=optional"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
@@ -235,11 +263,11 @@
               <ul class="selected-list" id="selectedList">
                 <li class="empty-message">No peripherals selected yet.</li>
               </ul>
-              <div
-                id="consoleConfigSection"
-                class="console-config-section"
-                style="display: none"
-              >
+              <!-- Rendered visible: updateConsoleConfig() shows this for every
+                   MCU that supports DeviceTree export, and the banner below is
+                   already the no-UART state it settles on, so starting hidden
+                   would only shift the export buttons down on load. -->
+              <div id="consoleConfigSection" class="console-config-section">
                 <h3>Serial Console</h3>
                 <div
                   id="consoleStatusBanner"
