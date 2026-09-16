@@ -86,7 +86,8 @@ The application uses native ES modules (`<script type="module">`). No bundler re
 The application uses a hierarchical JSON-based system:
 
 1. **manifest.json**: Top-level MCU catalog
-   - Lists all supported MCUs (nRF54L05, nRF54L10, nRF54L15, nRF54LV10A, nRF54LM20A)
+   - Lists all supported MCUs (nRF54L05, nRF54L10, nRF54L15, nRF54LV10A,
+     nRF54LC10A, nRF54LM20A, nRF54LS05A/B)
    - Maps MCUs to available packages
    - Defines which MCUs support non-secure builds (`supportsNonSecure`)
    - Defines which MCUs support FLPR (Fast Lightweight Processor) core (`supportsFLPR`)

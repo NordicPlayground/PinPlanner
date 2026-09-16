@@ -136,6 +136,33 @@ export const NRF54L_PARTS = [
     url: "https://www.nordicsemi.com/Products/nRF54L05",
   },
   {
+    id: "nrf54lc10a",
+    name: "nRF54LC10A",
+    mcuId: "nrf54lc10a",
+    nvmKb: 1012,
+    ramKb: 192,
+    vddMinV: 1.7,
+    vddMaxV: 3.6,
+    maxTxDbm: 4,
+    npu: false,
+    riscvCoprocessor: true,
+    trustZone: true,
+    ieee802154: true,
+    matter: true,
+    channelSounding: true,
+    hibernation: true,
+    protocols:
+      "Bluetooth LE, Channel Sounding, Matter, Thread, Zigbee, 2.4 GHz proprietary (up to 4 Mbps)",
+    summary:
+      "nRF54L10-class memory with only an essential peripheral set - three serial instances, no PWM, PDM, I2S, QDEC, NFC or USB - in two 1.9 x 2.3 mm CSPs and a QFN, with a sub-50 nA hibernation mode.",
+    caveats: [
+      "Only three serial instances (20, 21 and 30), and instances 20/21 reach P1 while 30 reaches P0 only.",
+      "No PWM, PDM, I2S/TDM, QDEC, NFC or USB peripherals.",
+      "The CSP29 breaks out no P0 pins, so it has no serial instance 30, GRTC output or RADIO DFE pin.",
+    ],
+    url: "https://www.nordicsemi.com/Products/nRF54LC10A",
+  },
+  {
     id: "nrf54lv10a",
     name: "nRF54LV10A",
     mcuId: "nrf54lv10a",

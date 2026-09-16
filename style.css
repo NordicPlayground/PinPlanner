@@ -452,10 +452,16 @@ option:disabled {
   min-height: 0;
 }
 #peripherals-list {
+  /* Pinned rather than capped, so the scroll box is reserved before the
+     peripheral buttons are rendered. Below 900px the columns stack and the pin
+     diagram sits under this list, where growing from zero shoved the diagram
+     several hundred pixels down the page on first paint. */
+  --peripherals-list-height: clamp(280px, 44vh, 620px);
   overflow-y: auto;
   flex-grow: 1;
   margin-top: 1rem;
-  max-height: clamp(280px, 44vh, 620px);
+  min-height: var(--peripherals-list-height);
+  max-height: var(--peripherals-list-height);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -579,6 +585,10 @@ input[type="radio"] {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  /* One entry's worth of space. The app auto-selects HFXO while loading, so
+     without this floor the card shrinks out from under the export buttons as
+     the empty message is replaced. */
+  min-height: 4.2rem;
 }
 .selected-item {
   background-color: var(--secondary-color);
@@ -679,6 +689,11 @@ button.secondary-btn:hover,
 /* 11. CHIP DISPLAY */
 .chip-display h2 {
   margin-bottom: 1rem;
+}
+/* The package name is filled in once the MCU data loads. Hold a line box open
+   until then, so the pin diagram does not jump down on first paint. */
+.chip-display h2:empty::before {
+  content: "\00a0";
 }
 .chip-container {
   position: relative;
@@ -1414,7 +1429,9 @@ button.secondary-btn:hover,
 .empty-message {
   color: var(--light-text);
   text-align: center;
-  padding: 2rem 0;
+  /* Kept within the .selected-list floor above so swapping the message for a
+     real entry does not resize the list. */
+  padding: 1.25rem 0;
 }
 .peripheral-item.disabled,
 .single-peripheral-btn.disabled {

@@ -34,7 +34,12 @@ export function getMcuSupportsFLPR(manifest, mcuId) {
   return mcu ? mcu.supportsFLPR === true : false;
 }
 
-const FLPR_XIP_MCUS = new Set(["nrf54lv10a", "nrf54lm20a", "nrf54l15"]);
+const FLPR_XIP_MCUS = new Set([
+  "nrf54lv10a",
+  "nrf54lc10a",
+  "nrf54lm20a",
+  "nrf54l15",
+]);
 
 export function getMcuSupportsFLPRXIP(manifest, mcuId) {
   return getMcuSupportsFLPR(manifest, mcuId) && FLPR_XIP_MCUS.has(mcuId);

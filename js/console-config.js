@@ -7,6 +7,7 @@ function usesFixedNsTfmSecureUartRouting(mcu) {
   return (
     mcu === "nrf54l10" ||
     mcu === "nrf54lv10a" ||
+    mcu === "nrf54lc10a" ||
     mcu === "nrf54lm20a" ||
     mcu === "nrf54l15"
   );
@@ -83,16 +84,7 @@ export function updateConsoleConfig() {
     if (limitationNote) {
       const showNsNote =
         usesFixedNsTfmSecureUartRouting(mcu) && state.consoleUart !== null;
-      const mcuLabel =
-        mcu === "nrf54l10"
-          ? "nrf54l10"
-          : mcu === "nrf54lv10a"
-            ? "nrf54lv10a"
-            : mcu === "nrf54lm20a"
-              ? "nrf54lm20a"
-              : mcu === "nrf54l15"
-                ? "nrf54l15"
-                : mcu;
+      const mcuLabel = mcu;
       limitationNote.textContent = showNsNote
         ? `For ${mcuLabel} cpuapp/ns builds, TF-M secure UART selection comes from nRF Connect SDK TF-M CMake. nRF Pin Planner cannot override it from generated board files, so TF-M UART logging stays disabled in the export.`
         : "";
