@@ -16,18 +16,8 @@
       "cornerRadius": 0.1
     },
     "layoutStrategy": {
-      "layoutType": "gridMatrix",
-      "rows": 8,
-      "columns": 6,
-      "rowLabels": ["A", "B", "C", "D", "E", "F", "G", "H"],
-      "columnLabels": ["1", "2", "3", "4", "5", "6"],
-      "pitchX": 0.3,
-      "pitchY": 0.3,
-      "originOffset": {
-        "x": -0.75,
-        "y": -1.05
-      },
-      "labelOriginConvention": "topLeft"
+      "layoutType": "customCoordinates",
+      "description": "Explicit coordinates for the CBAA CSP39 ball map: a 0.3 mm grid with the lone C1 ball offset 0.4 mm below row A instead of on the row pitch."
     },
     "pinDefaults": {
       "shape": "circle",
@@ -47,7 +37,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Power supply decoupling"],
-      "gridCoordinates": "A1"
+      "x": -0.75,
+      "y": -0.9
     },
     {
       "packagePinId": "A2",
@@ -58,7 +49,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Connection for 32 MHz crystal"],
-      "gridCoordinates": "A2"
+      "x": -0.45,
+      "y": -0.9
     },
     {
       "packagePinId": "A3",
@@ -69,7 +61,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Connection for 32 MHz crystal"],
-      "gridCoordinates": "A3"
+      "x": -0.15,
+      "y": -0.9
     },
     {
       "packagePinId": "A4",
@@ -80,7 +73,8 @@
       "isClockCapable": false,
       "powerDomain": "peripheral",
       "functions": ["AIN1", "Digital I/O", "Analog input"],
-      "gridCoordinates": "A4"
+      "x": 0.15,
+      "y": -0.9
     },
     {
       "packagePinId": "A5",
@@ -91,7 +85,8 @@
       "isClockCapable": false,
       "powerDomain": "peripheral",
       "functions": ["AIN0", "Digital I/O", "Analog input"],
-      "gridCoordinates": "A5"
+      "x": 0.45,
+      "y": -0.9
     },
     {
       "packagePinId": "A6",
@@ -110,7 +105,8 @@
         "Trace clock",
         "Analog input"
       ],
-      "gridCoordinates": "A6"
+      "x": 0.75,
+      "y": -0.9
     },
     {
       "packagePinId": "B2",
@@ -121,7 +117,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["No connect. Leave unconnected."],
-      "gridCoordinates": "B2"
+      "x": -0.45,
+      "y": -0.6
     },
     {
       "packagePinId": "B4",
@@ -132,7 +129,8 @@
       "isClockCapable": true,
       "powerDomain": "peripheral",
       "functions": ["GRTC CLKOUTFAST", "Digital I/O"],
-      "gridCoordinates": "B4"
+      "x": 0.15,
+      "y": -0.6
     },
     {
       "packagePinId": "B5",
@@ -143,7 +141,8 @@
       "isClockCapable": true,
       "powerDomain": "peripheral",
       "functions": ["AIN3", "Digital I/O", "Analog input"],
-      "gridCoordinates": "B5"
+      "x": 0.45,
+      "y": -0.6
     },
     {
       "packagePinId": "B6",
@@ -160,7 +159,8 @@
         "Trace data",
         "Analog input"
       ],
-      "gridCoordinates": "B6"
+      "x": 0.75,
+      "y": -0.6
     },
     {
       "packagePinId": "C1",
@@ -171,7 +171,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Single ended radio antenna connection"],
-      "gridCoordinates": "C1"
+      "x": -0.75,
+      "y": -0.5
     },
     {
       "packagePinId": "D3",
@@ -182,7 +183,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Ground"],
-      "gridCoordinates": "D3"
+      "x": -0.15,
+      "y": -0.3
     },
     {
       "packagePinId": "D4",
@@ -193,7 +195,8 @@
       "isClockCapable": true,
       "powerDomain": "peripheral",
       "functions": ["FLPR.0", "QSPI.SCK", "Digital I/O"],
-      "gridCoordinates": "D4"
+      "x": 0.15,
+      "y": -0.3
     },
     {
       "packagePinId": "D5",
@@ -204,7 +207,8 @@
       "isClockCapable": false,
       "powerDomain": "peripheral",
       "functions": ["AIN2", "Digital I/O", "Analog input"],
-      "gridCoordinates": "D5"
+      "x": 0.45,
+      "y": -0.3
     },
     {
       "packagePinId": "D6",
@@ -221,7 +225,8 @@
         "Connection for 32.768 kHz crystal",
         "Trace data"
       ],
-      "gridCoordinates": "D6"
+      "x": 0.75,
+      "y": -0.3
     },
     {
       "packagePinId": "E1",
@@ -232,7 +237,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Ground"],
-      "gridCoordinates": "E1"
+      "x": -0.75,
+      "y": 0.0
     },
     {
       "packagePinId": "E2",
@@ -243,7 +249,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Pin reset with on-chip pull-up"],
-      "gridCoordinates": "E2"
+      "x": -0.45,
+      "y": 0.0
     },
     {
       "packagePinId": "E3",
@@ -260,7 +267,8 @@
         "Digital I/O",
         "RADIO DFEGPIO"
       ],
-      "gridCoordinates": "E3"
+      "x": -0.15,
+      "y": 0.0
     },
     {
       "packagePinId": "E4",
@@ -271,7 +279,8 @@
       "isClockCapable": true,
       "powerDomain": "peripheral",
       "functions": ["FLPR.1", "QSPI.D0", "Digital I/O"],
-      "gridCoordinates": "E4"
+      "x": 0.15,
+      "y": 0.0
     },
     {
       "packagePinId": "E5",
@@ -288,7 +297,8 @@
         "TAMPC active shield output",
         "External reference"
       ],
-      "gridCoordinates": "E5"
+      "x": 0.45,
+      "y": 0.0
     },
     {
       "packagePinId": "E6",
@@ -305,7 +315,8 @@
         "Connection for 32.768 kHz crystal",
         "Trace data"
       ],
-      "gridCoordinates": "E6"
+      "x": 0.75,
+      "y": 0.0
     },
     {
       "packagePinId": "F1",
@@ -316,7 +327,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Ground"],
-      "gridCoordinates": "F1"
+      "x": -0.75,
+      "y": 0.3
     },
     {
       "packagePinId": "F2",
@@ -327,7 +339,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Serial wire clock. Input with on-chip pull-down."],
-      "gridCoordinates": "F2"
+      "x": -0.45,
+      "y": 0.3
     },
     {
       "packagePinId": "F3",
@@ -344,7 +357,8 @@
         "Digital I/O",
         "RADIO DFEGPIO"
       ],
-      "gridCoordinates": "F3"
+      "x": -0.15,
+      "y": 0.3
     },
     {
       "packagePinId": "F4",
@@ -361,7 +375,8 @@
         "Digital I/O",
         "RADIO DFEGPIO"
       ],
-      "gridCoordinates": "F4"
+      "x": 0.15,
+      "y": 0.3
     },
     {
       "packagePinId": "F5",
@@ -372,7 +387,8 @@
       "isClockCapable": true,
       "powerDomain": "peripheral",
       "functions": ["Digital I/O"],
-      "gridCoordinates": "F5"
+      "x": 0.45,
+      "y": 0.3
     },
     {
       "packagePinId": "F6",
@@ -393,7 +409,8 @@
         "Serial wire output",
         "Analog input"
       ],
-      "gridCoordinates": "F6"
+      "x": 0.75,
+      "y": 0.3
     },
     {
       "packagePinId": "G1",
@@ -404,7 +421,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Power supply decoupling"],
-      "gridCoordinates": "G1"
+      "x": -0.75,
+      "y": 0.6
     },
     {
       "packagePinId": "G2",
@@ -417,7 +435,8 @@
       "functions": [
         "Serial wire data. Bidirectional with standard-drive and on-chip pull-up."
       ],
-      "gridCoordinates": "G2"
+      "x": -0.45,
+      "y": 0.6
     },
     {
       "packagePinId": "G3",
@@ -428,7 +447,8 @@
       "isClockCapable": true,
       "powerDomain": "low_power",
       "functions": ["GRTC CLKOUT32K", "Digital I/O"],
-      "gridCoordinates": "G3"
+      "x": -0.15,
+      "y": 0.6
     },
     {
       "packagePinId": "G4",
@@ -439,7 +459,8 @@
       "isClockCapable": true,
       "powerDomain": "low_power",
       "functions": ["GRTC PWM", "Digital I/O"],
-      "gridCoordinates": "G4"
+      "x": 0.15,
+      "y": 0.6
     },
     {
       "packagePinId": "G5",
@@ -456,7 +477,8 @@
         "Analog input",
         "TAMPC active shield input"
       ],
-      "gridCoordinates": "G5"
+      "x": 0.45,
+      "y": 0.6
     },
     {
       "packagePinId": "G6",
@@ -467,7 +489,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Power supply decoupling"],
-      "gridCoordinates": "G6"
+      "x": 0.75,
+      "y": 0.6
     },
     {
       "packagePinId": "H1",
@@ -478,7 +501,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Power supply"],
-      "gridCoordinates": "H1"
+      "x": -0.75,
+      "y": 0.9
     },
     {
       "packagePinId": "H2",
@@ -489,7 +513,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Ground"],
-      "gridCoordinates": "H2"
+      "x": -0.45,
+      "y": 0.9
     },
     {
       "packagePinId": "H3",
@@ -500,7 +525,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Power supply"],
-      "gridCoordinates": "H3"
+      "x": -0.15,
+      "y": 0.9
     },
     {
       "packagePinId": "H4",
@@ -511,7 +537,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Ground"],
-      "gridCoordinates": "H4"
+      "x": 0.15,
+      "y": 0.9
     },
     {
       "packagePinId": "H5",
@@ -522,7 +549,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["DC/DC converter output"],
-      "gridCoordinates": "H5"
+      "x": 0.45,
+      "y": 0.9
     },
     {
       "packagePinId": "H6",
@@ -533,7 +561,8 @@
       "isClockCapable": false,
       "powerDomain": null,
       "functions": ["Power supply decoupling"],
-      "gridCoordinates": "H6"
+      "x": 0.75,
+      "y": 0.9
     }
   ],
   "socPeripherals": [
