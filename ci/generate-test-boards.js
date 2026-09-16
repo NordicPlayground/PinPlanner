@@ -1325,7 +1325,8 @@ const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
 // Clean and create output directory
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const SKIP_MCUS = ["nrf54lv10a"]; // No DTSI files in current Zephyr tree
+// SoC DTSI files ship in the nRF Connect SDK, not the Zephyr tree CI builds against
+const SKIP_MCUS = ["nrf54lv10a", "nrf54lc10a"];
 let totalBoards = 0;
 
 for (const mcu of manifest.mcus) {

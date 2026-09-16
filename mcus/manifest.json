@@ -17,6 +17,26 @@
       ]
     },
     {
+      "id": "nrf54lc10a",
+      "name": "nRF54LC10A",
+      "supportsNonSecure": true,
+      "supportsFLPR": true,
+      "packages": [
+        {
+          "file": "qfn48-6x6-qfaa",
+          "name": "QFN-48 (6x6)"
+        },
+        {
+          "file": "csp39-1.93x2.29-cbaa",
+          "name": "CSP-39 (1.93x2.29)"
+        },
+        {
+          "file": "csp29-1.93x2.29-caaa",
+          "name": "CSP-29 (1.93x2.29)"
+        }
+      ]
+    },
+    {
       "id": "nrf54lm20a",
       "name": "nRF54LM20A/B",
       "supportsNonSecure": true,

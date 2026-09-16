@@ -21,12 +21,24 @@ export function getMcuSupportsFLPRXIP(mcuId) {
   return getMcuSupportsFLPRXIPFromManifest(state.mcuManifest, mcuId);
 }
 
+function getMcuLabel(mcu) {
+  return mcu.toUpperCase().replace("NRF", "nRF");
+}
+
 function usesReservedFlprCpuappUart30(mcu) {
   return mcu === "nrf54l15" || mcu === "nrf54lm20a";
 }
 
+// The nRF54LV10A and nRF54LC10A SoC devicetree sources ship in the nRF Connect
+// SDK (the `nrf` module) instead of upstream Zephyr, so their includes resolve
+// under <nordic/...> and <common/nordic/...> rather than <vendor/nordic/...>,
+// and the nrf_mpc node and watchdog0 alias come from the board files.
+function usesNcsSocDtsi(mcu) {
+  return mcu === "nrf54lv10a" || mcu === "nrf54lc10a";
+}
+
 function getFixedNsTfmSecureUartId(mcu) {
-  if (mcu === "nrf54lv10a") {
+  if (usesNcsSocDtsi(mcu)) {
     return "UARTE20";
   }
 
@@ -136,7 +148,7 @@ function getConsoleRoutingNote(mcu) {
   }
 
   const effectiveConsoleUartId = getEffectiveConsoleUartId(mcu);
-  const mcuLabel = mcu.toUpperCase().replace("NRF", "nRF");
+  const mcuLabel = getMcuLabel(mcu);
   const reasonText =
     reasons.length > 0
       ? reasons.join("; ")
@@ -680,7 +692,7 @@ function getFlprBuildLayout(mcu) {
     };
   }
 
-  if (mcu === "nrf54lv10a") {
+  if (usesNcsSocDtsi(mcu)) {
     return {
       mode: "native",
       flashKb: 64,
@@ -729,6 +741,10 @@ function generateCpuappPartitionSection(mcu) {
     return `#include <nordic/${mcu}_partition.dtsi>`;
   }
 
+  if (mcu === "nrf54lc10a") {
+    return `#include <common/nordic/${mcu}_cpuapp_partition.dtsi>`;
+  }
+
   if (mcu === "nrf54lv10a") {
     return `&cpuapp_rram {
 \tpartitions {
@@ -765,7 +781,7 @@ function generateCpuappPartitionSection(mcu) {
 }
 
 function getNsPartitionInclude(mcu) {
-  if (mcu === "nrf54lv10a") {
+  if (usesNcsSocDtsi(mcu)) {
     return `#include <nordic/${mcu}_cpuapp_ns_partition.dtsi>`;
   }
 
@@ -804,7 +820,7 @@ ${generatePmicIncludes()}
 
 `;
 
-  if (mcu === "nrf54lv10a") {
+  if (usesNcsSocDtsi(mcu)) {
     content += `/ {
 \taliases {
 \t\twatchdog0 = &wdt31;
@@ -870,8 +886,9 @@ function generateGpioNodes(gpioPins) {
 }
 
 export function generateCpuappCommonDtsi(mcu) {
-  const baseInclude =
-    mcu === "nrf54lv10a" ? `#include <nordic/${mcu}_cpuapp.dtsi>\n` : "";
+  const baseInclude = usesNcsSocDtsi(mcu)
+    ? `#include <nordic/${mcu}_cpuapp.dtsi>\n`
+    : "";
 
   let content = `/*
  * Copyright (c) 2024 Nordic Semiconductor ASA
@@ -1023,11 +1040,12 @@ ${baseInclude}#include "${state.boardInfo.name}_common.dtsi"
 }
 
 export function generateMainDts(mcu, supportsNS) {
-  const mcuUpper = mcu.toUpperCase().replace("NRF", "nRF");
+  const mcuUpper = getMcuLabel(mcu);
   const dtsiBase = getMcuDtsiBaseName(mcu);
   const partitionSection = generateCpuappPartitionSection(mcu);
-  const baseInclude =
-    mcu === "nrf54lv10a" ? "" : `#include <nordic/${dtsiBase}_cpuapp.dtsi>\n`;
+  const baseInclude = usesNcsSocDtsi(mcu)
+    ? ""
+    : `#include <nordic/${dtsiBase}_cpuapp.dtsi>\n`;
   return `/dts-v1/;
 
 ${baseInclude}#include "${mcu}_cpuapp_common.dtsi"
@@ -1192,16 +1210,7 @@ CONFIG_TFM_SECURE_UART=y
 CONFIG_${tfmSecureUartChoice}=y
 `;
     } else if (hasConsoleUart && usesFixedNsTfmSecureUartRouting(mcu)) {
-      const mcuLabel =
-        mcu === "nrf54l10"
-          ? "nRF54L10"
-          : mcu === "nrf54lv10a"
-            ? "nRF54LV10A"
-            : mcu === "nrf54lm20a"
-              ? "nRF54LM20A"
-              : mcu === "nrf54l15"
-                ? "nRF54L15"
-                : mcu;
+      const mcuLabel = getMcuLabel(mcu);
       config += `
 # ${mcuLabel} TF-M secure UART selection is fixed inside the
 # nRF Connect SDK TF-M CMake configuration.
@@ -1280,7 +1289,7 @@ CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC=y
 }
 
 export function generateNSDts(mcu) {
-  const mcuUpper = mcu.toUpperCase().replace("NRF", "nRF");
+  const mcuUpper = getMcuLabel(mcu);
   const dtsiBase = getMcuDtsiBaseName(mcu);
   const tfmSecureUartNodeName = getNsTfmSecureUartNodeName(mcu);
 
@@ -1349,7 +1358,7 @@ ${getNsPartitionInclude(mcu)}
 }
 
 export function generateFLPRDts(mcu) {
-  const mcuUpper = mcu.toUpperCase().replace("NRF", "nRF");
+  const mcuUpper = getMcuLabel(mcu);
   const flprLayout = getFlprBuildLayout(mcu);
 
   // Use the exported board console UART instead of hardcoded uart30
@@ -1362,7 +1371,7 @@ export function generateFLPRDts(mcu) {
     uartStatusSection = `\n&${consoleNodeName} {\n\tstatus = "okay";\n};\n`;
   }
 
-  if (mcu === "nrf54lv10a") {
+  if (usesNcsSocDtsi(mcu)) {
     let content = `/dts-v1/;
 #include <nordic/${getMcuDtsiBaseName(mcu)}_cpuflpr.dtsi>
 #include "${state.boardInfo.name}_common.dtsi"
@@ -1715,17 +1724,26 @@ export function generateBoardCmake(mcu, supportsNS, supportsFLPR) {
   const mcuUpper = mcu.toUpperCase();
   const boardNameUpper = state.boardInfo.name.toUpperCase();
 
+  // J-Link has no nRF54LC10A target yet, so it is flashed as an nRF54LV10A -
+  // the same substitution Nordic's own nRF54LC10 DK board.cmake makes.
+  const jlinkSubstituteMcu = mcu === "nrf54lc10a" ? "nrf54lv10a" : null;
+  const jlinkDevice = (jlinkSubstituteMcu || mcu).toUpperCase().substring(3);
+
   let content = `# Copyright (c) 2024 Nordic Semiconductor ASA
 # SPDX-License-Identifier: Apache-2.0
 
-if(CONFIG_SOC_${mcuUpper}_CPUAPP)
-\tboard_runner_args(jlink "--device=nRF${mcuUpper.substring(3)}_M33" "--speed=4000")
+${
+  jlinkSubstituteMcu
+    ? `# Using the ${getMcuLabel(jlinkSubstituteMcu)} device until ${getMcuLabel(mcu)} is supported in jlink.\n`
+    : ""
+}if(CONFIG_SOC_${mcuUpper}_CPUAPP)
+\tboard_runner_args(jlink "--device=nRF${jlinkDevice}_M33" "--speed=4000")
 `;
 
   if (supportsFLPR) {
-    if (mcu === "nrf54l15") {
+    if (mcu === "nrf54l15" || jlinkSubstituteMcu) {
       content += `elseif(CONFIG_SOC_${mcuUpper}_CPUFLPR)
-\tboard_runner_args(jlink "--device=nRF${mcuUpper.substring(3)}_RV32")
+\tboard_runner_args(jlink "--device=nRF${jlinkDevice}_RV32")
 `;
     } else {
       content += `elseif(CONFIG_SOC_${mcuUpper}_CPUFLPR)
@@ -1810,6 +1828,12 @@ config SOC_NRF54LX_SKIP_GLITCHDETECTOR_DISABLE
 
 config NRF_RRAM_WRITE_BUFFER_SIZE
 \tdefault 16
+`;
+  } else if (mcu === "nrf54lc10a") {
+    content += `
+config NRF_RRAM_WRITE_BUFFER_SIZE
+\tdefault 16
+\trange 0 16
 `;
   }
 
@@ -1974,15 +1998,7 @@ export function generateReadme(mcu, pkg, supportsNS, supportsFLPR) {
     supportsNS &&
     usesFixedNsTfmSecureUartRouting(mcu) &&
     state.consoleUart !== null
-      ? `For \`cpuapp/ns\` builds on ${
-          mcu === "nrf54l10"
-            ? "nRF54L10"
-            : mcu === "nrf54lv10a"
-              ? "nRF54LV10A"
-              : mcu === "nrf54lm20a"
-                ? "nRF54LM20A"
-                : "nRF54L15"
-        }, TF-M secure UART routing is chosen by nRF Connect SDK TF-M CMake. nRF Pin Planner cannot override that from the generator, so TF-M UART logging stays disabled in the exported board files.`
+      ? `For \`cpuapp/ns\` builds on ${getMcuLabel(mcu)}, TF-M secure UART routing is chosen by nRF Connect SDK TF-M CMake. nRF Pin Planner cannot override that from the generator, so TF-M UART logging stays disabled in the exported board files.`
       : "Review any TF-M, partition-manager, or board-runner settings required by your NCS version.";
   const supportsFLPRXIP = supportsFLPR && getMcuSupportsFLPRXIP(mcu);
   const flprBuildArgs = requiresDisabledVprLauncher(mcu)
