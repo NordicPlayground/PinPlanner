@@ -19,6 +19,13 @@
   --dz-cyan-light: #5bd2e2;
   --on-primary: #ffffff;
 
+  /* The comparison launcher tab is position: fixed at the bottom of the
+     viewport, so at the end of the page it would otherwise sit on top of the
+     footer disclaimer. The footer adds this to its bottom padding to keep clear
+     of the collapsed tab (~35px, so there is room to spare). The tab expands
+     upwards over the page on hover, which is intended. */
+  --comparison-tab-height: 2.2rem;
+
   /* Light theme */
   --bg-color: #f3f4f5;
   --card-bg: #ffffff;
@@ -223,7 +230,7 @@ a:hover {
 .footer-inner {
   max-width: 1800px;
   margin: 0 auto;
-  padding: 1.75rem 2rem;
+  padding: 1.75rem 2rem calc(1.75rem + var(--comparison-tab-height));
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 2.5rem;
