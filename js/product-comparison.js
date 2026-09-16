@@ -4,10 +4,11 @@
 // table of every nRF54L part and package, with a button per row that loads that
 // combination into the planner.
 //
-// Part-level facts come from product-comparison-data.js. Package-level facts
-// (GPIO count, serial instances, ADC channels, package size, NFC/USB/audio/QSPI
-// availability) are derived from the same package JSON the pin diagram renders,
-// so the table can never disagree with the pin data.
+// Part-level facts come from product-comparison-data.js. Everything else is
+// derived from the same package JSON the pin diagram renders, so the table can
+// never disagree with the pin data: GPIO count, serial instances, ADC channels
+// and package size vary per package, while NFC/USB/audio/QSPI availability is
+// die-level and so renders once per part.
 
 import state from "./state.js";
 import { handleMcuChange, resolvePackageDataFor } from "./mcu-loader.js";
@@ -151,6 +152,35 @@ function packageSize(metrics) {
   return `${metrics.widthMm.toFixed(2)} &times; ${metrics.heightMm.toFixed(2)} mm`;
 }
 
+// The manifest label repeats the size ("QFN-52 (6x6)"), which the row already
+// shows underneath in full precision, so prefer the bare package type.
+function packageLabel(pkg, metrics) {
+  return metrics.packageType || pkg.name.replace(/\s*\([^)]*\)\s*$/, "");
+}
+
+// NFC, high-speed USB, digital audio and QSPI are die-level on the nRF54L
+// Series: every package of a given part exposes the same set, so these render
+// once per part rather than once per package. Warn if that stops holding.
+const DIE_LEVEL_FEATURE_KEYS = [
+  "hasNfc",
+  "hasUsbHighSpeed",
+  "hasDigitalAudio",
+  "hasQspi",
+];
+
+function dieLevelFeatures(part, packages) {
+  const [{ pkg: firstPkg, metrics: firstMetrics }] = packages;
+  const divergent = DIE_LEVEL_FEATURE_KEYS.filter((key) =>
+    packages.some(({ metrics }) => metrics[key] !== firstMetrics[key]),
+  );
+  if (divergent.length > 0) {
+    console.warn(
+      `${part.name}: ${divergent.join(", ")} differ between packages; the comparison shows the ${firstPkg.name} values.`,
+    );
+  }
+  return firstMetrics;
+}
+
 function isLoaded(part, pkg) {
   return (
     document.getElementById("mcuSelector")?.value === part.mcuId &&
@@ -159,6 +189,8 @@ function isLoaded(part, pkg) {
 }
 
 function partRowsMarkup({ part, packages }) {
+  const features = dieLevelFeatures(part, packages);
+
   return packages
     .map(({ pkg, metrics }, index) => {
       // Part-level facts span the part's packages; the rest vary per package.
@@ -176,23 +208,23 @@ function partRowsMarkup({ part, packages }) {
         <td rowspan="${packages.length}">+${part.maxTxDbm} dBm</td>
         <td rowspan="${packages.length}">${yesNo(part.npu)}</td>
         <td rowspan="${packages.length}">${yesNo(part.ieee802154)}</td>
-        <td rowspan="${packages.length}">${yesNo(part.matter)}</td>`
+        <td rowspan="${packages.length}">${yesNo(part.matter)}</td>
+        <td rowspan="${packages.length}">${yesNo(features.hasNfc)}</td>
+        <td rowspan="${packages.length}">${yesNo(features.hasUsbHighSpeed)}</td>
+        <td rowspan="${packages.length}">${yesNo(features.hasDigitalAudio)}</td>
+        <td rowspan="${packages.length}">${yesNo(features.hasQspi)}</td>`
           : "";
 
       return `
       <tr class="${index === 0 ? "comparison-group-start" : ""}${isLoaded(part, pkg) ? " is-loaded" : ""}">
         ${partCells}
         <td class="comparison-package">
-          ${escapeHtml(pkg.name)}
+          ${escapeHtml(packageLabel(pkg, metrics))}
           <span class="comparison-package-size">${packageSize(metrics)}</span>
         </td>
         <td>${metrics.gpioCount}</td>
         <td>${metrics.serialInterfaces}</td>
         <td>${metrics.adcChannels}</td>
-        <td>${yesNo(metrics.hasNfc)}</td>
-        <td>${yesNo(metrics.hasUsbHighSpeed)}</td>
-        <td>${yesNo(metrics.hasDigitalAudio)}</td>
-        <td>${yesNo(metrics.hasQspi)}</td>
         <td>
           <button
             type="button"
@@ -221,14 +253,14 @@ function tableMarkup() {
             <th scope="col" title="Axon NPU for on-device AI">NPU</th>
             <th scope="col" title="IEEE 802.15.4: Thread and Zigbee">15.4</th>
             <th scope="col">Matter</th>
-            <th scope="col">Package</th>
-            <th scope="col">GPIO</th>
-            <th scope="col" title="Serial instances, each usable as SPI, TWI or UART">Serial</th>
-            <th scope="col" title="ADC channels">ADC</th>
             <th scope="col" title="NFC tag (NFCT)">NFC</th>
             <th scope="col" title="High-speed USB">USB</th>
             <th scope="col" title="Digital audio: I2S, PDM or TDM">Audio</th>
             <th scope="col" title="QSPI for external flash">QSPI</th>
+            <th scope="col">Package</th>
+            <th scope="col">GPIO</th>
+            <th scope="col" title="Serial instances, each usable as SPI, TWI or UART">Serial</th>
+            <th scope="col" title="ADC channels">ADC</th>
             <th scope="col"><span class="visually-hidden">Load</span></th>
           </tr>
         </thead>
